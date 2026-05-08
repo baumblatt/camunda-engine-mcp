@@ -584,6 +584,185 @@ const tools: Tool[] = [
       },
       required: ['processInstanceId']
     }
+  },
+  {
+    name: 'getExternalTasks',
+    description: 'Get a list of external tasks (workers queue)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topicName: {
+          type: 'string',
+          description: 'Filter by topic name.'
+        },
+        activityId: {
+          type: 'string',
+          description: 'Filter by activity id.'
+        },
+        activityIdIn: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter by a list of activity ids (any-of).'
+        },
+        processInstanceId: {
+          type: 'string',
+          description: 'Filter by process instance id.'
+        },
+        processInstanceIdIn: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter by a list of process instance ids (any-of).'
+        },
+        processDefinitionId: {
+          type: 'string',
+          description: 'Filter by process definition id.'
+        },
+        active: {
+          type: 'boolean',
+          description: 'Only include active external tasks.'
+        },
+        suspended: {
+          type: 'boolean',
+          description: 'Only include suspended external tasks.'
+        },
+        sortBy: {
+          type: 'string',
+          description:
+            'Sort field. One of: id, lockExpirationTime, processInstanceId, processDefinitionId, processDefinitionKey, taskPriority, tenantId.'
+        },
+        sortOrder: {
+          type: 'string',
+          description: 'Sort order: asc or desc.'
+        },
+        firstResult: {
+          type: 'number',
+          description: 'Pagination of results. Specifies the index of the first result to return.'
+        },
+        maxResults: {
+          type: 'number',
+          description: 'Pagination of results. Specifies the maximum number of results to return.'
+        }
+      }
+    }
+  },
+  {
+    name: 'getExternalTask',
+    description:
+      'Get a single external task by id. Useful to inspect workerId, lockExpirationTime, retries and suspended state before completing or unlocking.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        externalTaskId: {
+          type: 'string',
+          description: 'The id of the external task.'
+        }
+      },
+      required: ['externalTaskId']
+    }
+  },
+  {
+    name: 'countExternalTasks',
+    description: 'Count external tasks matching the given filters',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topicName: {
+          type: 'string',
+          description: 'Filter by topic name.'
+        },
+        activityId: {
+          type: 'string',
+          description: 'Filter by activity id.'
+        },
+        activityIdIn: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter by a list of activity ids (any-of).'
+        },
+        processInstanceId: {
+          type: 'string',
+          description: 'Filter by process instance id.'
+        },
+        processInstanceIdIn: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter by a list of process instance ids (any-of).'
+        },
+        processDefinitionId: {
+          type: 'string',
+          description: 'Filter by process definition id.'
+        },
+        active: {
+          type: 'boolean',
+          description: 'Only count active external tasks.'
+        },
+        suspended: {
+          type: 'boolean',
+          description: 'Only count suspended external tasks.'
+        }
+      }
+    }
+  },
+  {
+    name: 'completeExternalTask',
+    description: 'Complete an external task. Requires the workerId that currently holds the lock.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        externalTaskId: {
+          type: 'string',
+          description: 'The id of the external task to complete.'
+        },
+        workerId: {
+          type: 'string',
+          description: 'The id of the worker that completes the task. Must match the lock owner.'
+        },
+        variables: {
+          type: 'object',
+          description:
+            'Process variables to set on completion. Camunda format: { name: { value, type? } }.'
+        },
+        localVariables: {
+          type: 'object',
+          description:
+            'Variables local to the external task scope. Camunda format: { name: { value, type? } }.'
+        }
+      },
+      required: ['externalTaskId', 'workerId']
+    }
+  },
+  {
+    name: 'setExternalTaskPriority',
+    description: 'Set the priority of an external task',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        externalTaskId: {
+          type: 'string',
+          description: 'The id of the external task.'
+        },
+        priority: {
+          type: 'number',
+          description: 'The new priority value.'
+        }
+      },
+      required: ['externalTaskId', 'priority']
+    }
+  },
+  {
+    name: 'unlockExternalTask',
+    description:
+      'Unlock an external task, clearing its lockExpirationTime and workerId so it becomes available again.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        externalTaskId: {
+          type: 'string',
+          description: 'The id of the external task to unlock.'
+        }
+      },
+      required: ['externalTaskId']
+    }
   }
 ];
 
@@ -1072,6 +1251,119 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
             }
           ]
         };
+
+      case 'getExternalTasks': {
+        const params: Record<string, any> = { ...args };
+        if (Array.isArray(params.activityIdIn)) {
+          params.activityIdIn = params.activityIdIn.join(',');
+        }
+        if (Array.isArray(params.processInstanceIdIn)) {
+          params.processInstanceIdIn = params.processInstanceIdIn.join(',');
+        }
+        const externalTasksResponse = await axios.get(`${baseUrl}/external-task`, {
+          params,
+          ...authConfig
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(externalTasksResponse.data, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'getExternalTask': {
+        const externalTaskResponse = await axios.get(
+          `${baseUrl}/external-task/${args.externalTaskId}`,
+          authConfig
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(externalTaskResponse.data, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'countExternalTasks': {
+        const params: Record<string, any> = { ...args };
+        if (Array.isArray(params.activityIdIn)) {
+          params.activityIdIn = params.activityIdIn.join(',');
+        }
+        if (Array.isArray(params.processInstanceIdIn)) {
+          params.processInstanceIdIn = params.processInstanceIdIn.join(',');
+        }
+        const countResponse = await axios.get(`${baseUrl}/external-task/count`, {
+          params,
+          ...authConfig
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(countResponse.data, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'completeExternalTask': {
+        await axios.post(
+          `${baseUrl}/external-task/${args.externalTaskId}/complete`,
+          {
+            workerId: args.workerId,
+            variables: args.variables || {},
+            localVariables: args.localVariables || {}
+          },
+          authConfig
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `✅ External task ${args.externalTaskId} completed by worker ${args.workerId}`
+            }
+          ]
+        };
+      }
+
+      case 'setExternalTaskPriority': {
+        await axios.put(
+          `${baseUrl}/external-task/${args.externalTaskId}/priority`,
+          {
+            priority: args.priority
+          },
+          authConfig
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `✅ Priority of external task ${args.externalTaskId} set to ${args.priority}`
+            }
+          ]
+        };
+      }
+
+      case 'unlockExternalTask': {
+        await axios.post(
+          `${baseUrl}/external-task/${args.externalTaskId}/unlock`,
+          undefined,
+          authConfig
+        );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `✅ External task ${args.externalTaskId} unlocked`
+            }
+          ]
+        };
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);
