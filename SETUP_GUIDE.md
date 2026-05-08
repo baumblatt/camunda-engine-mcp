@@ -1,6 +1,6 @@
 # 📋 Setup Guide
 
-## 🛠️ Available MCP Tools (21 total)
+## 🛠️ Available MCP Tools (27 total)
 
 ### Process Management (5 tools)
 - `getProcessDefinitions` - Retrieve process definitions with filtering
@@ -32,6 +32,14 @@
 - `setProcessVariables` - Update process variables
 - `getActivityInstances` - Monitor process execution state
 - `getIncidents` - Track and resolve process errors
+
+### External Tasks Management (6 tools)
+- `getExternalTasks` - List external tasks with filters (topicName, activityId, activityIdIn, processInstanceId, processInstanceIdIn, processDefinitionId, active, suspended)
+- `getExternalTask` - Inspect a single external task by id (workerId, lockExpirationTime, retries, suspended)
+- `countExternalTasks` - Count external tasks matching filters
+- `completeExternalTask` - Complete an external task (requires the workerId that holds the lock)
+- `setExternalTaskPriority` - Change the priority of an external task
+- `unlockExternalTask` - Release the lock on an external task so it becomes available again
 
 ## 📁 Large File Support
 

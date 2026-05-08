@@ -5,7 +5,7 @@
 [![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io)
 [![Camunda](https://img.shields.io/badge/Camunda-7.19+-orange.svg)](https://camunda.com)
 
-A **Model Context Protocol (MCP) server** that enables AI assistants to interact with **Camunda Platform** workflow engine. Provides **21 specialized tools** for complete workflow automation and process management.
+A **Model Context Protocol (MCP) server** that enables AI assistants to interact with **Camunda Platform** workflow engine. Provides **27 specialized tools** for complete workflow automation and process management.
 
 **✅ PRODUCTION READY** - Fully tested, containerized, and ready for deployment.
 
@@ -56,9 +56,10 @@ Deploy BPMN from file /workspace/bpmn/simple-process.bpmn
 
 ## 🎯 Features
 
-- **21 MCP Tools** for complete Camunda workflow management
+- **27 MCP Tools** for complete Camunda workflow management
 - **Process Management** - Deploy, start, monitor BPMN processes
 - **Task Management** - Handle user tasks and forms
+- **External Tasks** - List, inspect, complete, prioritize and unlock worker tasks
 - **Large File Support** - Deploy big BPMN files via file paths
 - **Production Ready** - Docker, monitoring, health checks
 - **Real-time Integration** - Direct connection to live Camunda instances
