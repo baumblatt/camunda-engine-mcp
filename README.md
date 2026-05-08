@@ -79,7 +79,7 @@ Deploy BPMN from file /workspace/bpmn/your-process.bpmn
 
 ## 📚 Documentation
 
-- **[Setup Guide](SETUP_GUIDE.md)** - Detailed configuration and all 21 tools
+- **[Setup Guide](SETUP_GUIDE.md)** - Detailed configuration and all 27 tools
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing framework
 - **[Production Report](PRODUCTION_READINESS_REPORT.md)** - Production readiness details
