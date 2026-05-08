@@ -29,9 +29,8 @@ export default [
       'prefer-const': 'error',
       'no-var': 'error',
       
-      // Стиль кода
-      'indent': ['error', 2],
-      'quotes': ['error', 'single'],
+      // Стиль кода (indent owned by Prettier)
+      'quotes': ['error', 'single', { avoidEscape: true }],
       'semi': ['error', 'always'],
       'comma-dangle': ['error', 'never'],
       'object-curly-spacing': ['error', 'always'],
